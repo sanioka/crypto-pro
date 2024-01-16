@@ -7,7 +7,7 @@ function Message({ message, onChange }) {
   }, [onChange])
 
   return (
-    <>
+    <div style={{ marginBottom: '15px'}}>
       <label htmlFor="message">Подписываемое сообщение: *</label>
 
       <br/>
@@ -22,7 +22,7 @@ function Message({ message, onChange }) {
         onChange={onMessageChange}
         autoFocus
         required/>
-    </>
+    </div>
   );
 }
 

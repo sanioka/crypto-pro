@@ -1,136 +1,85 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { createAttachedSignature, createDetachedSignature, createHash } from 'crypto-pro';
-import Message from './components/Message';
-import Certificate from './components/Certificate';
-import SignatureType from './components/SignatureType';
-import Hash from './components/Hash';
-import Signature from './components/Signature';
-import CustomSystemInfo from './components/CustomSystemInfo';
-import SystemInfo from './components/SystemInfo';
+
+import Message from "./components/Message";
+import Certificate from "./components/Certificate";
+import SignatureType from "./components/SignatureType";
+import Hash from "./components/Hash";
+import Signature from "./components/Signature";
+import CustomSystemInfo from "./components/CustomSystemInfo";
+import SystemInfo from "./components/SystemInfo";
+import SignButton from "./components/SignButton";
+import SignCheckDescription from "./components/SignCheckDescription";
+
+import { createSignature } from "./helper/createSignature";
+import { useHashSignature } from "./hooks/useHashSignature";
 
 function App() {
-  const [message, setMessage] = useState('Привет мир!');
+  const [message, setMessage] = useState("Привет мир!");
   const [certificate, setCertificate] = useState(null);
   const [isDetachedSignature, setDetachedSignature] = useState(true);
 
-  const [hash, setHash] = useState('');
-  const [hashStatus, setHashStatus] = useState('Не вычислен');
-  const [hashError, setHashError] = useState(null);
+  const {
+    hash,
+    hashStatus,
+    hashError,
+    signature,
+    signatureStatus,
+    signatureError,
+    setStatus,
+    STATUS
+  } = useHashSignature();
 
-  const [signature, setSignature] = useState('');
-  const [signatureStatus, setSignatureStatus] = useState('Не создана');
-  const [signatureError, setSignatureError] = useState(null);
+  // Удаляем результаты вычислений при изменении пользовательских данных
+  useEffect(
+    () => setStatus(STATUS.INIT),
+    [certificate, message, isDetachedSignature, setStatus, STATUS]
+  );
 
-  const createSignature = useCallback(async (event) => {
-    let hash;
-
+  const submitHandler = useCallback(async (event) => {
     event.preventDefault();
 
-    setSignature('');
-    setSignatureError(null);
-
-    setHash('');
-    setHashError(null);
-    setHashStatus('Вычисляется...');
+    setStatus(STATUS.IN_PROGRESS);
 
     try {
-      hash = await createHash(message);
+      const result = await createSignature({ thumbprint: certificate.thumbprint, message, isDetachedSignature });
 
-      setHash(hash);
-    } catch (error) {
-      setHashError(error.message);
-
-      return;
-    }
-
-    setHashStatus('Не вычислен');
-    setSignatureStatus('Создается...');
-
-    if (isDetachedSignature) {
-      try {
-        setSignature(await createDetachedSignature(certificate.thumbprint, hash));
-      } catch (error) {
-        setSignatureError(error.message);
+      if (result.hash.error || result.signature.error) {
+        setStatus(STATUS.ERROR, result);
+        return;
       }
 
-      setSignatureStatus('Не создана');
-
-      return;
+      setStatus(STATUS.DONE, result);
+    } catch (e) {
+      setStatus(STATUS.ERROR);
+      console.error(e);
     }
-
-    try {
-      setSignature(await createAttachedSignature(certificate.thumbprint, message));
-    } catch (error) {
-      setSignatureError(error.message);
-    }
-
-    setSignatureStatus('Не создана');
-  }, [certificate, isDetachedSignature, message])
-
-  // Удаляем результаты вычислений после изменения выбранного сертификата
-  useEffect(() => {
-    setHash('')
-    setHashStatus('Не вычислен')
-    setHashError(null)
-
-    setSignature('')
-    setSignatureStatus('Не создана')
-    setSignatureError(null)
-  }, [certificate])
+  }, [certificate, isDetachedSignature, message, setStatus, STATUS]);
 
   return (
     <>
-      <form onSubmit={createSignature} noValidate>
+      <form onSubmit={submitHandler} noValidate>
         <fieldset>
           <legend>Создание подписи</legend>
+          <Message message={message} onChange={setMessage} />
+          <Certificate certificate={certificate} onChange={setCertificate} />
+          <SignatureType isDetachedSignature={isDetachedSignature} onChange={setDetachedSignature} />
 
-          <Message message={message} onChange={setMessage}/>
-
-          <br/><br/>
-
-          <Certificate certificate={certificate} onChange={setCertificate}/>
-
-          <SignatureType isDetachedSignature={isDetachedSignature} onChange={setDetachedSignature}/>
-
-          <br/><br/>
-          <hr/>
-
-          <button
-            type="submit"
-            disabled={!certificate || !message}>
-            Создать подпись
-          </button>
+          <hr />
+          <SignButton disabled={!certificate || !message} />
         </fieldset>
       </form>
 
-      <fieldset style={{marginTop: '15px', marginBottom: '15px'}}>
+      <fieldset style={{ marginTop: "15px", marginBottom: "15px" }}>
         <legend>Результат</legend>
-
-        <Hash
-          hash={hash}
-          hashStatus={hashStatus}
-          hashError={hashError}/>
-
-        <Signature
-          signature={signature}
-          signatureStatus={signatureStatus}
-          signatureError={signatureError}/>
-
-        <p>
-          Для <a href="https://www.gosuslugi.ru/pgu/eds/"
-                 target="_blank"
-                 rel="nofollow noopener noreferrer"
-                 title="Перейти к проверке подписи">проверки</a> нужно
-          создать файл со сгенерированной подписью в кодировке UTF-8 с расширением *.sgn
-          <br/>
-          для отделенной подписи (или *.sig для совмещенной).
-        </p>
+        <Hash hash={hash} hashStatus={hashStatus} hashError={hashError} />
+        <Signature signature={signature} signatureStatus={signatureStatus} signatureError={signatureError} />
+        <SignCheckDescription />
       </fieldset>
 
       <fieldset>
         <legend>Информация о системе</legend>
-        <CustomSystemInfo/>
-        <SystemInfo/>
+        <CustomSystemInfo />
+        <SystemInfo />
       </fieldset>
     </>
   );

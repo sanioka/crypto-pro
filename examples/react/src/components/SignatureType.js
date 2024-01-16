@@ -8,7 +8,7 @@ function SignatureType({ isDetachedSignature, onChange }) {
   }, [onChange])
 
   return (
-    <>
+    <div style={{ marginBottom: '15px'}}>
       <label>Тип подписи: *</label>
 
       <br/>
@@ -28,7 +28,7 @@ function SignatureType({ isDetachedSignature, onChange }) {
           value={1}
           checked={isDetachedSignature}
           onChange={onTypeToggle}/>Отделенная</label>
-    </>
+    </div>
   )
 }
 
