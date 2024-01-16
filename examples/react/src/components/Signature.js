@@ -10,7 +10,7 @@ function Signature({signature, signatureStatus, signatureError}) {
       <textarea
         id="signature"
         cols="80"
-        rows="30"
+        rows="10"
         value={signature}
         placeholder={signatureStatus}
         readOnly/>
@@ -20,4 +20,4 @@ function Signature({signature, signatureStatus, signatureError}) {
   )
 }
 
-export default Signature;
+export default React.memo(Signature);

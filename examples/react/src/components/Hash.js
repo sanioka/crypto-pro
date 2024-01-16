@@ -3,8 +3,6 @@ import React from 'react';
 function Hash({hash, hashStatus, hashError}) {
   return (
     <>
-      <legend>Результат</legend>
-
       <label htmlFor="hash">Хеш (ГОСТ Р 34.11-2012 256 бит):</label>
 
       <br/>
@@ -22,4 +20,4 @@ function Hash({hash, hashStatus, hashError}) {
   )
 }
 
-export default Hash;
+export default React.memo(Hash);

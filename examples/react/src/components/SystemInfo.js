@@ -29,4 +29,4 @@ function SystemInfo() {
   );
 }
 
-export default SystemInfo;
+export default React.memo(SystemInfo);

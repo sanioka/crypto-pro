@@ -8,8 +8,6 @@ function Message({ message, onChange }) {
 
   return (
     <>
-      <legend>Создание подписи</legend>
-
       <label htmlFor="message">Подписываемое сообщение: *</label>
 
       <br/>

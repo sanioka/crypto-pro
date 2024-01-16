@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from "react";
 import { createAttachedSignature, createDetachedSignature, createHash } from 'crypto-pro';
 import Message from './components/Message';
 import Certificate from './components/Certificate';
@@ -21,7 +21,7 @@ function App() {
   const [signatureStatus, setSignatureStatus] = useState('Не создана');
   const [signatureError, setSignatureError] = useState(null);
 
-  async function createSignature(event) {
+  const createSignature = useCallback(async (event) => {
     let hash;
 
     event.preventDefault();
@@ -65,12 +65,25 @@ function App() {
     }
 
     setSignatureStatus('Не создана');
-  }
+  }, [certificate, isDetachedSignature, message])
+
+  // Удаляем результаты вычислений после изменения выбранного сертификата
+  useEffect(() => {
+    setHash('')
+    setHashStatus('Не вычислен')
+    setHashError(null)
+
+    setSignature('')
+    setSignatureStatus('Не создана')
+    setSignatureError(null)
+  }, [certificate])
 
   return (
     <>
       <form onSubmit={createSignature} noValidate>
         <fieldset>
+          <legend>Создание подписи</legend>
+
           <Message message={message} onChange={setMessage}/>
 
           <br/><br/>
@@ -90,7 +103,9 @@ function App() {
         </fieldset>
       </form>
 
-      <fieldset>
+      <fieldset style={{marginTop: '15px', marginBottom: '15px'}}>
+        <legend>Результат</legend>
+
         <Hash
           hash={hash}
           hashStatus={hashStatus}

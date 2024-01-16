@@ -42,7 +42,7 @@ function CustomSystemInfo() {
         setCustomSystemInfoError(error.message);
       }
     })();
-  });
+  }, []);
 
   return (
     <pre>
@@ -55,4 +55,4 @@ function CustomSystemInfo() {
   );
 }
 
-export default CustomSystemInfo;
+export default React.memo(CustomSystemInfo);
