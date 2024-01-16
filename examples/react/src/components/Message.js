@@ -1,14 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback } from "react";
 
-function Message({onChange}) {
-  const [message, setMessage] = useState('Привет мир!');
+function Message({ message, onChange }) {
 
-  function onMessageChange(event) {
-    setMessage(event.target.value);
+  const onMessageChange = useCallback((event) => {
     onChange(event.target.value);
-  }
-
-  useEffect(() => onChange(message));
+  }, [onChange])
 
   return (
     <>
@@ -32,4 +28,4 @@ function Message({onChange}) {
   );
 }
 
-export default Message;
+export default React.memo(Message);

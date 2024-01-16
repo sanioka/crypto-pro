@@ -9,12 +9,14 @@ import CustomSystemInfo from './components/CustomSystemInfo';
 import SystemInfo from './components/SystemInfo';
 
 function App() {
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState('Привет мир!');
   const [certificate, setCertificate] = useState(null);
   const [detachedSignature, setSignatureType] = useState(null);
+
   const [hash, setHash] = useState('');
   const [hashStatus, setHashStatus] = useState('Не вычислен');
   const [hashError, setHashError] = useState(null);
+
   const [signature, setSignature] = useState('');
   const [signatureStatus, setSignatureStatus] = useState('Не создана');
   const [signatureError, setSignatureError] = useState(null);
@@ -69,7 +71,7 @@ function App() {
     <>
       <form onSubmit={createSignature} noValidate>
         <fieldset>
-          <Message onChange={setMessage}/>
+          <Message message={message} onChange={setMessage}/>
 
           <br/><br/>
 
