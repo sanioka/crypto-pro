@@ -4,15 +4,19 @@ import { getCertificate, getUserCertificates } from 'crypto-pro';
 function Certificate({onChange}) {
   const [certificates, setCertificates] = useState([]);
   const [certificatesError, setCertificatesError] = useState([]);
+
   const [certificate, setCertificate] = useState(null);
+
   const [certificateDetails, setCertificateDetails] = useState(null);
   const [detailsError, setDetailsError] = useState(null);
 
   function selectCertificate(event) {
-    const certificate = certificates.find(({thumbprint}) => thumbprint === event.target.value);
+    const selectedThumbprint = event.target.value
 
-    setCertificate(certificate);
-    onChange(certificate);
+    const selectedCertificate = certificates.find(({thumbprint}) => thumbprint === selectedThumbprint) ?? null;
+
+    setCertificate(selectedCertificate);
+    onChange(selectedCertificate);
   }
 
   async function loadCertificateDetails(thumbprint) {
@@ -66,12 +70,12 @@ function Certificate({onChange}) {
 
       <br/>
 
-      <select id="certificate" onChange={selectCertificate}>
-        <option defaultValue={null}>Не выбран</option>
+      <select id="certificate" onChange={selectCertificate} style={{width: '675px'}}>
+        <option value={'default'}>Не выбран</option>
 
         {certificates.map(({name, thumbprint, validTo}) =>
           <option key={thumbprint} value={thumbprint}>
-            {name + ' (действителен до: ' + validTo + ')'}
+            {name + ' (действителен до: ' + validTo.split('T')[0] + ')'}
           </option>
         )}
       </select>
