@@ -1,8 +1,17 @@
 import { createAttachedSignature, createDetachedSignature, createHash } from "crypto-pro";
 
-/**
- * Метод для формирования ЭЦП, хуком выведен в отдельный файл из App.js
- */
+// Domain model
+// const result = {
+//   hash: {
+//     error: null,
+//     data: null
+//   },
+//   signature: {
+//     error: null,
+//     data: null
+//   }
+// };
+
 export const createSignature = async (props) => {
   const { thumbprint, isDetachedSignature, message } = props;
 

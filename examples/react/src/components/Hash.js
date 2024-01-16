@@ -1,11 +1,13 @@
-import React from 'react';
+import React from "react";
 
-function Hash({hash, hashStatus, hashError}) {
+function Hash({ hashData }) {
+  const { hash, hashStatus, hashError } = hashData;
+
   return (
     <>
       <label htmlFor="hash">Хеш (ГОСТ Р 34.11-2012 256 бит):</label>
 
-      <br/>
+      <br />
 
       <textarea
         id="hash"
@@ -13,11 +15,11 @@ function Hash({hash, hashStatus, hashError}) {
         rows="5"
         value={hash}
         placeholder={hashStatus}
-        readOnly/>
+        readOnly />
 
       <pre>{hashError || null}</pre>
     </>
-  )
+  );
 }
 
 export default React.memo(Hash);

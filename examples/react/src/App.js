@@ -11,53 +11,48 @@ import SignButton from "./components/SignButton";
 import SignCheckDescription from "./components/SignCheckDescription";
 
 import { createSignature } from "./helper/createSignature";
-import { useHashSignature } from "./hooks/useHashSignature";
+import { useHashSignature, STATUS } from "./hooks/useHashSignature";
 
 function App() {
   const [message, setMessage] = useState("Привет мир!");
   const [certificate, setCertificate] = useState(null);
   const [isDetachedSignature, setDetachedSignature] = useState(true);
 
-  const {
-    hash,
-    hashStatus,
-    hashError,
-    signature,
-    signatureStatus,
-    signatureError,
-    setStatus,
-    STATUS
-  } = useHashSignature();
+  // Стейты для отображения вычисленного хеша/эцп выведены в отдельный хук
+  const { hashData, signatureData, setHashSignature } = useHashSignature();
 
-  // Удаляем результаты вычислений при изменении пользовательских данных
+  // Сбрасываем хеш/эцп, если пользователь меняет входящие данные (другое сообщение, другой сертификат итд)
   useEffect(
-    () => setStatus(STATUS.INIT),
-    [certificate, message, isDetachedSignature, setStatus, STATUS]
+    () => setHashSignature(STATUS.INIT, { reset: true }),
+    [certificate, message, isDetachedSignature, setHashSignature]
   );
 
-  const submitHandler = useCallback(async (event) => {
+  // Метод сводит модель данных и UI через интерфейс result
+  const onSubmitController = useCallback(async (event) => {
+    const { IN_PROGRESS, DONE, ERROR } = STATUS;
     event.preventDefault();
 
-    setStatus(STATUS.IN_PROGRESS);
+    setHashSignature(IN_PROGRESS, { reset: true });
 
     try {
+      // Модель данных отделена от view
       const result = await createSignature({ thumbprint: certificate.thumbprint, message, isDetachedSignature });
 
       if (result.hash.error || result.signature.error) {
-        setStatus(STATUS.ERROR, result);
+        setHashSignature(ERROR, { result });
         return;
       }
 
-      setStatus(STATUS.DONE, result);
+      setHashSignature(DONE, { result });
     } catch (e) {
-      setStatus(STATUS.ERROR);
+      setHashSignature(ERROR);
       console.error(e);
     }
-  }, [certificate, isDetachedSignature, message, setStatus, STATUS]);
+  }, [certificate, isDetachedSignature, message, setHashSignature]);
 
   return (
     <>
-      <form onSubmit={submitHandler} noValidate>
+      <form onSubmit={onSubmitController} noValidate>
         <fieldset>
           <legend>Создание подписи</legend>
           <Message message={message} onChange={setMessage} />
@@ -71,8 +66,8 @@ function App() {
 
       <fieldset style={{ marginTop: "15px", marginBottom: "15px" }}>
         <legend>Результат</legend>
-        <Hash hash={hash} hashStatus={hashStatus} hashError={hashError} />
-        <Signature signature={signature} signatureStatus={signatureStatus} signatureError={signatureError} />
+        <Hash hashData={hashData} />
+        <Signature signatureData={signatureData} />
         <SignCheckDescription />
       </fieldset>
 

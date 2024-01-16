@@ -1,11 +1,15 @@
-import React from 'react';
+import React from "react";
 
-function Signature({signature, signatureStatus, signatureError}) {
+function Signature({ signatureData }) {
+  const { signature, signatureStatus, signatureError } = signatureData;
+
+  const lengthData = signature && signature.length ? `(PKCS7, length = ${signature.length} symbols)` : '(PKCS7)'
+
   return (
     <>
-      <label htmlFor="signature">Подпись (PKCS7):</label>
+      <label htmlFor="signature">Подпись {lengthData}:</label>
 
-      <br/>
+      <br />
 
       <textarea
         id="signature"
@@ -13,11 +17,11 @@ function Signature({signature, signatureStatus, signatureError}) {
         rows="10"
         value={signature}
         placeholder={signatureStatus}
-        readOnly/>
+        readOnly />
 
       <pre>{signatureError || null}</pre>
     </>
-  )
+  );
 }
 
 export default React.memo(Signature);
