@@ -11,7 +11,7 @@ import SystemInfo from './components/SystemInfo';
 function App() {
   const [message, setMessage] = useState('Привет мир!');
   const [certificate, setCertificate] = useState(null);
-  const [detachedSignature, setSignatureType] = useState(null);
+  const [isDetachedSignature, setDetachedSignature] = useState(true);
 
   const [hash, setHash] = useState('');
   const [hashStatus, setHashStatus] = useState('Не вычислен');
@@ -46,7 +46,7 @@ function App() {
     setHashStatus('Не вычислен');
     setSignatureStatus('Создается...');
 
-    if (detachedSignature) {
+    if (isDetachedSignature) {
       try {
         setSignature(await createDetachedSignature(certificate.thumbprint, hash));
       } catch (error) {
@@ -77,7 +77,7 @@ function App() {
 
           <Certificate certificate={certificate} onChange={setCertificate}/>
 
-          <SignatureType onChange={setSignatureType}/>
+          <SignatureType isDetachedSignature={isDetachedSignature} onChange={setDetachedSignature}/>
 
           <br/><br/>
           <hr/>

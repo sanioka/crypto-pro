@@ -1,14 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback } from "react";
 
-function SignatureType({onChange}) {
-  const [type, setType] = useState(true);
+function SignatureType({ isDetachedSignature, onChange }) {
 
-  function onTypeToggle() {
-    setType(!type);
-    onChange(!type);
-  }
-
-  useEffect(() => onChange(type));
+  const onTypeToggle = useCallback((event) => {
+    const value = parseInt(event.target.value);
+    onChange(!!value);
+  }, [onChange])
 
   return (
     <>
@@ -19,7 +16,8 @@ function SignatureType({onChange}) {
       <label>
         <input
           type="radio"
-          checked={!type}
+          checked={!isDetachedSignature}
+          value={0}
           onChange={onTypeToggle}/>Совмещенная</label>
 
       <br/>
@@ -27,10 +25,11 @@ function SignatureType({onChange}) {
       <label>
         <input
           type="radio"
-          checked={type}
+          value={1}
+          checked={isDetachedSignature}
           onChange={onTypeToggle}/>Отделенная</label>
     </>
   )
 }
 
-export default SignatureType;
+export default React.memo(SignatureType);
