@@ -75,7 +75,7 @@ function App() {
 
           <br/><br/>
 
-          <Certificate onChange={setCertificate}/>
+          <Certificate certificate={certificate} onChange={setCertificate}/>
 
           <SignatureType onChange={setSignatureType}/>
 

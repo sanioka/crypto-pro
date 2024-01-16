@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { getUserCertificates } from 'crypto-pro';
 
-function Certificate({onChange}) {
-  const [certificates, setCertificates] = useState([]);
+function Certificate({ certificate, onChange }) {
+  const [certificateList, setCertificateList] = useState([]);
   const [certificatesError, setCertificatesError] = useState([]);
-
-  const [certificate, setCertificate] = useState(null);
 
   const [certificateDetails, setCertificateDetails] = useState(null);
   const [detailsError, setDetailsError] = useState(null);
@@ -13,9 +11,8 @@ function Certificate({onChange}) {
   function selectCertificate(event) {
     const selectedThumbprint = event.target.value
 
-    const selectedCertificate = certificates.find(({thumbprint}) => thumbprint === selectedThumbprint) ?? null;
+    const selectedCertificate = certificateList.find(({thumbprint}) => thumbprint === selectedThumbprint) ?? null;
 
-    setCertificate(selectedCertificate);
     onChange(selectedCertificate);
 
     setCertificateDetails(null);
@@ -24,8 +21,6 @@ function Certificate({onChange}) {
 
   async function loadCertificateDetails(certificate) {
     try {
-      // const certificate = await getCertificate(thumbprint);
-
       setCertificateDetails({
         name: certificate.name,
         issuerName: certificate.issuerName,
@@ -60,7 +55,7 @@ function Certificate({onChange}) {
   useEffect(() => {
     (async () => {
       try {
-        setCertificates(await getUserCertificates());
+        setCertificateList(await getUserCertificates());
       } catch (error) {
         setCertificatesError(error.message);
       }
@@ -76,7 +71,7 @@ function Certificate({onChange}) {
       <select id="certificate" onChange={selectCertificate} style={{width: '675px'}}>
         <option value={'default'}>Не выбран</option>
 
-        {certificates.map(({name, thumbprint, validTo}) =>
+        {certificateList.map(({name, thumbprint, validTo}) =>
           <option key={thumbprint} value={thumbprint}>
             {name + ' (действителен до: ' + validTo.split('T')[0] + ')'}
           </option>
@@ -108,4 +103,4 @@ function Certificate({onChange}) {
   );
 }
 
-export default Certificate;
+export default React.memo(Certificate);
