@@ -19,6 +19,7 @@
   "scripts": {
     "serve": "static --host-address localhost --port 8081 build",
     "start": "react-scripts start",
+    "start-node18": "react-scripts --openssl-legacy-provider start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
