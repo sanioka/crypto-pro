@@ -16,7 +16,7 @@ function SystemInfo() {
         setSystemInfoError(error.message);
       }
     })();
-  });
+  }, []);
 
   return (
     <pre>
