@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getCertificate, getUserCertificates } from 'crypto-pro';
+import { getUserCertificates } from 'crypto-pro';
 
 function Certificate({onChange}) {
   const [certificates, setCertificates] = useState([]);
@@ -17,11 +17,14 @@ function Certificate({onChange}) {
 
     setCertificate(selectedCertificate);
     onChange(selectedCertificate);
+
+    setCertificateDetails(null);
+    if (selectedCertificate) loadCertificateDetails(selectedCertificate)
   }
 
-  async function loadCertificateDetails(thumbprint) {
+  async function loadCertificateDetails(certificate) {
     try {
-      const certificate = await getCertificate(thumbprint);
+      // const certificate = await getCertificate(thumbprint);
 
       setCertificateDetails({
         name: certificate.name,
@@ -84,9 +87,12 @@ function Certificate({onChange}) {
 
       {certificate ? (
         <>
-          <details
-            onClick={loadCertificateDetails.bind(this, certificate.thumbprint)}>
+          <details>
             <summary>Информация о сертификате</summary>
+
+            <pre>
+              {JSON.stringify(certificate, null, '  ')}
+            </pre>
 
             <pre>
               {certificateDetails ? (
