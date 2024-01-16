@@ -58,7 +58,7 @@ function Certificate({onChange}) {
         setCertificatesError(error.message);
       }
     })();
-  });
+  }, []);
 
   return (
     <>
