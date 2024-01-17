@@ -1,5 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from "react";
 import { getUserCertificates } from 'crypto-pro';
+
+const localStorageKey = 'selectedCertificateThumbprint';
+const DEFAULT_THUMBPRINT = 'default';
 
 function Certificate({ certificate, onChange }) {
   const [certificateList, setCertificateList] = useState([]);
@@ -8,16 +11,19 @@ function Certificate({ certificate, onChange }) {
   const [certificateDetails, setCertificateDetails] = useState(null);
   const [detailsError, setDetailsError] = useState(null);
 
-  function selectCertificate(event) {
+  const selectCertificate = useCallback((event) => {
     const selectedThumbprint = event.target.value
+
+    // Сохраняем в localStorage выбранное значение
+    selectedThumbprint === DEFAULT_THUMBPRINT ? localStorage.removeItem(localStorageKey) : localStorage.setItem(localStorageKey, selectedThumbprint);
 
     const selectedCertificate = certificateList.find(({thumbprint}) => thumbprint === selectedThumbprint) ?? null;
 
     onChange(selectedCertificate);
 
     setCertificateDetails(null);
-    if (selectedCertificate) loadCertificateDetails(selectedCertificate)
-  }
+    if (selectedCertificate) loadCertificateDetails(selectedCertificate);
+  }, [certificateList, onChange]);
 
   async function loadCertificateDetails(certificate) {
     try {
@@ -62,14 +68,23 @@ function Certificate({ certificate, onChange }) {
     })();
   }, []);
 
+  // Подставляем ранее выбранный сертификат из localStorage
+  useEffect(() => {
+    const localStorageThumbprint = localStorage.getItem(localStorageKey);
+    if (localStorageThumbprint && localStorageThumbprint !== DEFAULT_THUMBPRINT) {
+      selectCertificate({ target: { value: localStorageThumbprint } });
+    }
+  }, [selectCertificate]);
+
   return (
     <>
       <label htmlFor="certificate">Сертификат: *</label>
 
       <br/>
 
-      <select id="certificate" onChange={selectCertificate} style={{width: '675px'}}>
-        <option value={'default'}>Не выбран</option>
+      <select id="certificate" onChange={selectCertificate} style={{ width: "675px" }}
+              value={certificate && certificate.thumbprint ? certificate.thumbprint : DEFAULT_THUMBPRINT}>
+        <option value={DEFAULT_THUMBPRINT}>Не выбран</option>
 
         {certificateList.map(({name, thumbprint, validTo}) =>
           <option key={thumbprint} value={thumbprint}>
